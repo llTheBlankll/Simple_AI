@@ -61,6 +61,7 @@ def takeCommand():
 def startup():
     """
     * Removing the long intro. that slows the testing and development.
+    * Can be remove anytime.
     speak("Initializing Jarvis")
     speak("Starting all systems applications")
     speak("Installing and checking for all drivers")
@@ -85,48 +86,59 @@ def main():
     query = takeCommand()
 
     # Logic for executing  tasks as per the query
+
+    # Search the word from Wikipedia
     if 'wikipedia' in query.lower():
         speak('Searching wikipedia...')
         query = query.replace("wikipedia", "")
         results = wikipedia.summary(query, sentences=2)
         print(results)
         speak(results)
+
+    # Go to youtube
     elif 'open youtube' in query.lower():
-        url = "youtube.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("YOUTUBE_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Go to google
     elif 'open google' in query.lower():
-        url = "google.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("GOOGLE_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Go to facebook
     elif 'open facebook' in query.lower():
-        url = "facebook.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("FACEBOOK_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Go to instagram
     elif 'open instagram' in query.lower():
-        url = "instagram.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("INSTAGRAM_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Go to Twitter
     elif 'open twitter' in query.lower():
-        url = "twitter.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("TWITTER_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Go to Netflix
     elif 'open netflix' in query.lower():
-        url = "netflix.com"
-        chrome_path = 'C:/Program Files/Google/Chrome/Application/chrome.exe %s'
+        url = os.getenv("NETFLIX_WEB")
+        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
         webbrowser.get(chrome_path).open(url)
 
+    # Music
     elif 'play music' in query.lower():
-        songs_dir = "C:\\Users\\63956\\Music\\Musics"
+        songs_dir = os.getenv("MUSIC_BASE_DIRECTORY")
         songs = os.listdir(songs_dir)
         print(songs)
         os.startfile(os.path.join(songs_dir, songs[0]))
 
+    # Date and Time
     elif 'what time and date today' in query.lower():
         strTime = datetime.datetime.now().strftime("%H:%M:%S %p")
         date = datetime.datetime.now().strftime("%m %d %Y")
@@ -134,12 +146,10 @@ def main():
         speak(f"{MASTER} and the date is {date}")
 
     elif 'open visual code' in query.lower():
-        codePath = "D:\\Microsoft VS Code\\Code.exe"
-        os.startfile(codePath)
+        os.startfile(os.getenv("VSCODE_EXE"))
 
     elif 'open pycharm' in query.lower():
-        pycharmPath = "D:\\APPS\\PyCharm Community Edition 2021.3.3\\bin\\pycharm64.exe"
-        os.startfile(pycharmPath)
+        os.startfile(os.getenv("PYCHARM_EXE"))
 
     elif 'what us today weather condition' in query.lower(): # * Get Today Weather Condition (ex.: Moderate Rain, Rainy)
         speak(f"Today is {weather.getTodayCondition()} {MASTER}")
