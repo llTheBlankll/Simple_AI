@@ -7,7 +7,7 @@ import os
 import dotenv
 
 # Load the environment variables which is more safe and a good habit rather than loading it directly on the script.
-dotenv.load_dotenv()
+dotenv.load_dotenv(dotenv_path="./config.env")
 
 MASTER = os.getenv("MASTER")
 
@@ -22,7 +22,7 @@ def speak(text):
     engine.runAndWait()
 
 
-# This Function will speak or greet you
+# This function will speak or greet you
 def wishMe():
     hour = int(datetime.datetime.now().hour)
     if hour >= 0 and hour < 12:
