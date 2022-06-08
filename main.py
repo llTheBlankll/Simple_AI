@@ -6,6 +6,8 @@ import webbrowser
 import os
 import dotenv
 
+from weather import Weather
+
 # Load the environment variables which is more safe and a good habit rather than loading it directly on the script.
 dotenv.load_dotenv(dotenv_path="./config.env")
 
@@ -14,6 +16,9 @@ MASTER = os.getenv("MASTER")
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
+
+
+weather = Weather(os.getenv("WEATHER_API"))
 
 
 # Speak Function
@@ -133,8 +138,12 @@ def main():
         os.startfile(codePath)
 
     elif 'open pycharm' in query.lower():
-        codePath = "D:\\APPS\\PyCharm Community Edition 2021.3.3\\bin\\pycharm64.exe"
-        os.startfile(codePath)
+        pycharmPath = "D:\\APPS\\PyCharm Community Edition 2021.3.3\\bin\\pycharm64.exe"
+        os.startfile(pycharmPath)
+
+    elif 'what us today weather condition' in query.lower(): # * Get Today Weather Condition (ex.: Moderate Rain, Rainy)
+        speak(f"Today is {weather.getTodayCondition()} {MASTER}")
+        print(f"Today is {weather.getTodayCondition()}")
 
 
 if __name__ == "__main__":
