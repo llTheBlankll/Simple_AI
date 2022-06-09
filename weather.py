@@ -12,8 +12,8 @@ class Weather:
         self.api = api
         self.weather_region = os.getenv('WEATHER_LOCATION_REGION')
         self.forecast_url = f"http://api.weatherapi.com/v1/forecast.json?key={self.api}&q={self.weather_region}&days=1&aqi=no&alerts=no"
-        # With this variable in __init__(self), the script doesn't need to request the content to the server every single time
-        # which improve the program speed, response, and effectively reducing the weather api server load.
+        # With this variable in __init__(self), the script doesn't need to request the content to the server every
+        # single time which improve the program speed, response, and effectively reducing the weather api server load.
         self.forecast_source_data = requests.get(self.forecast_url)
 
     """
@@ -41,4 +41,3 @@ For Testing...
 Will get removed after the testing is finished.
 """
 weather = Weather(os.getenv("WEATHER_API"))
-print(weather.getTodayUVIndex())

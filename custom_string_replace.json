@@ -1,0 +1,12 @@
+[
+  {
+    "name": "<CHROME>",
+    "data": "CHROME_EXE",
+    "type": "VAR_ENVIRONMENT"
+  },
+  {
+    "name": "<VSCODE_EXE>",
+    "data": "VSCODE_EXE",
+    "type": "VAR_ENVIRONMENT"
+  }
+]

@@ -1,3 +1,5 @@
+import json
+
 import pyttsx3  # Recognition Voice Function
 import datetime
 import speech_recognition as sr
@@ -16,7 +18,6 @@ MASTER = os.getenv("MASTER")
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
-
 
 weather = Weather(os.getenv("WEATHER_API"))
 
@@ -40,7 +41,7 @@ def wishMe():
 
 
 # This function will take command from Microphone
-def takeCommand():
+def takeCommand() -> str:
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -54,7 +55,8 @@ def takeCommand():
         print("Say that again please.")
         query = None
     except sr.UnknownValueError as e:
-        print("Unknown Value ERROR: \n" + e)
+        print("Unknown Value ERROR")
+
     return query
 
 
@@ -77,84 +79,52 @@ def startup():
     speak(f"{MASTER} the date today is {date}")
     """
 
+def special_string_replace(value: str):
+    with open("./custom_string_replace.json", "r") as csp:
+        data = json.load(csp)
 
-# * Main Program starts here..
-def main():
-    # speak("Initializing Jarvis...")
-    startup()
-    wishMe()
-    query = takeCommand()
+        for json_object in data:
+            for keys, content in json_object.items():
+                if keys == "name" and content in value:
+                    value = value.replace(json_object["name"], os.getenv(json_object["data"]) if json_object["type"] == "VAR_ENVIRONMENT" else json_object["data"])
+                    value = value.replace("\\", "/")
+                    break
+        return value
 
-    # Logic for executing  tasks as per the query
 
-    # Search the word from Wikipedia
-    if 'wikipedia' in query.lower():
-        speak('Searching wikipedia...')
-        query = query.replace("wikipedia", "")
-        results = wikipedia.summary(query, sentences=2)
-        print(results)
-        speak(results)
+def sentence_execution():
+    # Temporarily disabled for testing and developement.
+    # query = takeCommand()
 
-    # Go to youtube
-    elif 'open youtube' in query.lower():
-        url = os.getenv("YOUTUBE_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
+    with open("sentences_logic.json", "r") as sentences:
+        data = json.load(sentences)
 
-    # Go to google
-    elif 'open google' in query.lower():
-        url = os.getenv("GOOGLE_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
+        # query = takeCommand().lower()
+        query = "open instagram"
 
-    # Go to facebook
-    elif 'open facebook' in query.lower():
-        url = os.getenv("FACEBOOK_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
+        for sentence_object in data:
+            sentence = sentence_object["sentence"]
+            sentence_execute = sentence_object["execute"]
+            sentence_type = sentence_object["type"]
+            # * This if condition will be used if we are executing applications or only for the AI Speaking.
+            if sentence in query.lower():
+                # If the query has sentence similarity from this,
+                # the code according to the meaning of the sentence is called.
+                special_string_processed = special_string_replace(sentence_execute)
 
-    # Go to instagram
-    elif 'open instagram' in query.lower():
-        url = os.getenv("INSTAGRAM_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
-
-    # Go to Twitter
-    elif 'open twitter' in query.lower():
-        url = os.getenv("TWITTER_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
-
-    # Go to Netflix
-    elif 'open netflix' in query.lower():
-        url = os.getenv("NETFLIX_WEB")
-        chrome_path = f'{os.getenv("CHROME_EXE")} {url}'
-        webbrowser.get(chrome_path).open(url)
-
-    # Music
-    elif 'play music' in query.lower():
-        songs_dir = os.getenv("MUSIC_BASE_DIRECTORY")
-        songs = os.listdir(songs_dir)
-        print(songs)
-        os.startfile(os.path.join(songs_dir, songs[0]))
-
-    # Date and Time
-    elif 'what time and date today' in query.lower():
-        strTime = datetime.datetime.now().strftime("%H:%M:%S %p")
-        date = datetime.datetime.now().strftime("%m %d %Y")
-        speak(f"{MASTER} the time is {strTime}")
-        speak(f"{MASTER} and the date is {date}")
-
-    elif 'open visual code' in query.lower():
-        os.startfile(os.getenv("VSCODE_EXE"))
-
-    elif 'open pycharm' in query.lower():
-        os.startfile(os.getenv("PYCHARM_EXE"))
-
-    elif 'what us today weather condition' in query.lower(): # * Get Today Weather Condition (ex.: Moderate Rain, Rainy)
-        speak(f"Today is {weather.getTodayCondition()} {MASTER}")
-        print(f"Today is {weather.getTodayCondition()}")
-
+                # START_FILE: This will start the file with or without argument.
+                # SAY: Use the speak() function to say.
+                if sentence_type == "START_FILE":
+                    os.startfile(special_string_processed)
+                elif sentence_type == "SAY":
+                    speak(special_string_processed)
+            # Else, we will create our own block just like the first version of this project.
+            elif "what is today's weather" in query.lower():
+                speak(f"Today's weather is { weather.getTodayCondition() }")
+            elif "wikipedia" in query.lower():
+                query = query.replace("wikipedia", "")
+                info = wikipedia.summary(query.lower(), sentence=2)
 
 if __name__ == "__main__":
-    main()
+    sentence_execution()
+    #main()
