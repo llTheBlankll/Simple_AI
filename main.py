@@ -4,7 +4,7 @@ import pyttsx3  # Recognition Voice Function
 import datetime
 import speech_recognition as sr
 import wikipedia
-import webbrowser
+import playsound
 import os
 import dotenv
 
@@ -60,25 +60,6 @@ def takeCommand() -> str:
     return query
 
 
-def startup():
-    """
-    * Removing the long intro. that slows the testing and development.
-    * Can be remove anytime.
-    speak("Initializing Jarvis")
-    speak("Starting all systems applications")
-    speak("Installing and checking for all drivers")
-    speak("Calibrating and examines all the core processors")
-    speak("Checking for internet service")
-    speak("Wait for a moment" + MASTER)
-    speak("All drivers are up and running")
-    speak("All systems have been activated")
-    speak("Now I am online how may I help you" + MASTER)
-    strTime = datetime.datetime.now().strftime("%H:%M:%S %p")
-    date = datetime.datetime.now().strftime("%m %d %Y")
-    speak(f"{MASTER} the time today is {strTime}")
-    speak(f"{MASTER} the date today is {date}")
-    """
-
 def special_string_replace(value: str):
     with open("./custom_string_replace.json", "r") as csp:
         data = json.load(csp)
@@ -124,7 +105,14 @@ def sentence_execution():
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
                 info = wikipedia.summary(query.lower(), sentence=2)
+                speak(info)
+            elif "play music" in query.lower():
+                song_directory = os.getenv("MUSIC_BASE_DIRECTORY")
+                song_list = os.listdir(song_directory)
+                for song in song_list:
+                    speak(f"Playing {song}")
+                    playsound.playsound(song)
 
 if __name__ == "__main__":
     sentence_execution()
-    #main()
+    # main()

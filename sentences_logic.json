@@ -1,0 +1,13 @@
+[
+  {
+    "sentence": "open instagram",
+    "execute": "\"<CHROME>\" https://instagram.com",
+    "type": "START_FILE"
+  },
+  {
+    "sentence": "open instagram",
+    "execute": "\"<CHROME>\" https://instagram.com",
+    "type": "START_FILE"
+  }
+]
+
