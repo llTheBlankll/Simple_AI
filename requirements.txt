@@ -2,4 +2,4 @@ pyttsx3
 speechrecognition
 wikipedia
 python-dotenv
-playsound
+pydub

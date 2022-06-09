@@ -7,8 +7,10 @@ import wikipedia
 import playsound
 import os
 import dotenv
+import music
 
 from weather import Weather
+from music import Music
 
 # Load the environment variables which is more safe and a good habit rather than loading it directly on the script.
 dotenv.load_dotenv(dotenv_path="./config.env")
@@ -19,7 +21,9 @@ engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 
-weather = Weather(os.getenv("WEATHER_API"))
+# * Modules Startup
+mod_weather = Weather(os.getenv("WEATHER_API"))
+mod_music = Music(os.getenv("MUSIC_BASE_DIRECTORY"))
 
 
 # Speak Function
@@ -67,7 +71,9 @@ def special_string_replace(value: str):
         for json_object in data:
             for keys, content in json_object.items():
                 if keys == "name" and content in value:
-                    value = value.replace(json_object["name"], os.getenv(json_object["data"]) if json_object["type"] == "VAR_ENVIRONMENT" else json_object["data"])
+                    value = value.replace(json_object["name"], os.getenv(json_object["data"]) if json_object[
+                                                                                                     "type"] == "VAR_ENVIRONMENT" else
+                    json_object["data"])
                     value = value.replace("\\", "/")
                     break
         return value
@@ -101,17 +107,18 @@ def sentence_execution():
                     speak(special_string_processed)
             # Else, we will create our own block just like the first version of this project.
             elif "what is today's weather" in query.lower():
-                speak(f"Today's weather is { weather.getTodayCondition() }")
+                speak(f"Today's weather is {mod_weather.getTodayCondition()}")
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
                 info = wikipedia.summary(query.lower(), sentence=2)
                 speak(info)
-            elif "play music" in query.lower():
-                song_directory = os.getenv("MUSIC_BASE_DIRECTORY")
-                song_list = os.listdir(song_directory)
-                for song in song_list:
-                    speak(f"Playing {song}")
-                    playsound.playsound(song)
+            elif ("play music" in query.lower()) or ("play song" in query.lower()):
+                mod_music.play_music()
+            elif ("stop music" in query.lower()) or ("stop song" in query.lower()):
+                mod_music.stop_music()
+            elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
+                mod_music.replay_music()
+
 
 if __name__ == "__main__":
     sentence_execution()
