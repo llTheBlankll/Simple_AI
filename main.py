@@ -87,7 +87,7 @@ def sentence_execution():
         data = json.load(sentences)
 
         # query = takeCommand().lower()
-        query = "open instagram"
+        query = "open instagra"
 
         for sentence_object in data:
             sentence = sentence_object["sentence"]
@@ -102,9 +102,11 @@ def sentence_execution():
                 # START_FILE: This will start the file with or without argument.
                 # SAY: Use the speak() function to say.
                 if sentence_type == "START_FILE":
-                    os.startfile(special_string_processed)
+                    os.system(special_string_processed)
+                    break
                 elif sentence_type == "SAY":
                     speak(special_string_processed)
+                    break
             # Else, we will create our own block just like the first version of this project.
             elif "what is today's weather" in query.lower():
                 speak(f"Today's weather is {mod_weather.getTodayCondition()}")
@@ -114,10 +116,16 @@ def sentence_execution():
                 speak(info)
             elif ("play music" in query.lower()) or ("play song" in query.lower()):
                 mod_music.play_music()
+                break
             elif ("stop music" in query.lower()) or ("stop song" in query.lower()):
                 mod_music.stop_music()
+                break
             elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
                 mod_music.replay_music()
+                break
+            else:
+                speak("I didn't understand what you said. Please try again.")
+                break
 
 
 if __name__ == "__main__":
