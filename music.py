@@ -20,7 +20,7 @@ class Play(multiprocessing.Process):
             # Playing the entire duration of song.
             # block parameter is used to keep the program running and not stop during the song.
             playsound.playsound(song_path, block=True)
-            print("I CAN STILL CONTINUE!!!")
+            print(f"Song {song} is finished.")
         except FileNotFoundError:
             print(f"File {song} not found.")
             time.sleep(1)
@@ -89,6 +89,7 @@ class Music(threading.Thread):
 
         if self.song_thread.is_alive():
             print("There is a song playing, stopping it...")
+            # Stopping the current song that's playing.
             self.stop_music()
             print("Success! Playing the previous music.")
-            self.play_song(self.previous_song)
+            self.song_thread = multiprocessing.Process(target=Play, args=(self.song_directory, self.previous_song,))

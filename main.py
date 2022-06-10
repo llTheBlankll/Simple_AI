@@ -54,13 +54,13 @@ def takeCommand() -> str:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-us')
         print(f"user said: {query}\n")
-    except sr.WaitTimeoutError as e:
+    except sr.WaitTimeoutError:
         print("Say that again please.")
         query = None
-    except sr.UnknownValueError as e:
+    except sr.UnknownValueError:
         print("Unknown Value ERROR")
 
-    return query
+    return query if query is not None or query != "" else exit(1)
 
 
 def special_string_replace(value: str):
@@ -84,7 +84,7 @@ def sentence_execution():
         data = json.load(sentences)
 
         # query = takeCommand().lower()
-        query = "play music"
+        query = takeCommand()
 
         if query == "" or query is None:
             speak("Please say a voice command.")
@@ -114,24 +114,20 @@ def sentence_execution():
                 break
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
-                info = wikipedia.summary(query.lower(), sentence=2)
+                info = wikipedia.summary(query.lower(), sentences=2)
                 speak(info)
             elif ("play music" in query.lower()) or ("play song" in query.lower()):
                 mod_music.play_music()
-                query = None
                 break
             elif ("stop music" in query.lower()) or ("stop song" in query.lower()):
                 mod_music.stop_music()
-                query = None
                 break
             elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
                 mod_music.replay_music()
-                query = None
                 break
-
-        print("Playing the entire music")
 
 
 if __name__ == "__main__":
-    sentence_execution()
+    while True:
+        sentence_execution()
     # main()
