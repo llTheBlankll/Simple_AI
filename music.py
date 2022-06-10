@@ -6,6 +6,30 @@ import mutagen.mp3  # Getting the duration of the song.
 import threading
 import playsound
 
+
+class Play(multiprocessing.Process):
+    def __init__(self, song_directory, song):
+        super().__init__()
+        try:
+            song_path = song_directory + "\\" + song
+
+            # Set condition variables
+            self.is_playing = True
+            self.song_duration = mutagen.mp3.MP3(song_directory + "\\" + song).info.length
+
+            # Playing the entire duration of song.
+            # block parameter is used to keep the program running and not stop during the song.
+            playsound.playsound(song_path, block=True)
+            print("I CAN STILL CONTINUE!!!")
+        except FileNotFoundError:
+            print(f"File {song} not found.")
+            time.sleep(1)
+            return
+        except KeyboardInterrupt:
+            print("Song Stopped.")
+            return
+
+
 class Music(threading.Thread):
     def __init__(self, song_directory):
         # Check if the directory exists.
@@ -22,42 +46,16 @@ class Music(threading.Thread):
         self.is_playing = False
 
         # Threads
-        self.song_thread = threading.Thread()
+        self.song_thread = multiprocessing.Process()
 
         # Integers
         self.song_duration = 0  # Seconds. Its value will be assigned later.
-
-        # Debugging
-        print("Song Directory: " + self.song_directory)
-        count: int = 0
-        for song in os.listdir(self.song_directory):
-            print(str(count) + ". Song found: " + song.replace(".mp3", ""))
-            count += 1
-
-    def play_song(self, song: str):
-        try:
-            print(self.song_directory + "\\" + song)
-            song_path = self.song_directory + "\\" + song
-            self.is_playing = True
-            self.song_duration = mutagen.mp3.MP3(self.song_directory + "\\" + song).info.length
-
-            # Playing the entire duration of song.
-            # block parameter is used to keep the program running and not stop during the song.
-            playsound.playsound(song_path, block=True)
-            print("I CAN STILL CONTINUE!!!")
-        except FileNotFoundError:
-            print(f"File {song} not found.")
-            time.sleep(1)
-            return
-        except KeyboardInterrupt:
-            print("Song Stopped.")
-            return
 
     def play_music(self):
         song_directory = os.listdir(self.song_directory)
         song_directory.remove("desktop.ini")
         for song in song_directory:
-            self.song_thread = threading.Thread(target=self.play_song, args=(song,))
+            self.song_thread = multiprocessing.Process(target=Play, args=(self.song_directory, song,))
             if self.is_playing:
                 try:
                     print("Playing...")
@@ -68,16 +66,17 @@ class Music(threading.Thread):
                     print("Stopping Song...")
                     time.sleep(0.5)
                     print("Song stopped.")
-                    self.song_thread.join()
+                    self.stop_music()
+                break
             else:
                 print(f"Play the first song {song}")
-                self.song_thread.run()
+                self.song_thread.start()
                 print("Song started!")
-                time.sleep(self.song_duration)
+                break
 
     def stop_music(self):
         if self.song_thread is not None:
-            self.song_thread.join()
+            self.song_thread.terminate()
         else:
             print("No music is playing.")
 

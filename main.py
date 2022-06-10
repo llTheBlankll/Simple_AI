@@ -1,13 +1,12 @@
 import json
+import time
 
 import pyttsx3  # Recognition Voice Function
 import datetime
 import speech_recognition as sr
 import wikipedia
-import playsound
 import os
 import dotenv
-import music
 
 from weather import Weather
 from music import Music
@@ -61,10 +60,7 @@ def takeCommand() -> str:
     except sr.UnknownValueError as e:
         print("Unknown Value ERROR")
 
-    if query == "" or query is None:
-        speak("Please speak something.")
-    else:
-        return query
+    return query
 
 
 def special_string_replace(value: str):
@@ -89,6 +85,10 @@ def sentence_execution():
 
         # query = takeCommand().lower()
         query = "play music"
+
+        if query == "" or query is None:
+            speak("Please say a voice command.")
+            return
 
         for sentence_object in data:
             sentence = sentence_object["sentence"]
@@ -118,16 +118,18 @@ def sentence_execution():
                 speak(info)
             elif ("play music" in query.lower()) or ("play song" in query.lower()):
                 mod_music.play_music()
+                query = None
                 break
             elif ("stop music" in query.lower()) or ("stop song" in query.lower()):
                 mod_music.stop_music()
+                query = None
                 break
             elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
                 mod_music.replay_music()
+                query = None
                 break
 
-        speak("Sorry, I didn't understand.")
-        return
+        print("Playing the entire music")
 
 
 if __name__ == "__main__":
