@@ -5,8 +5,18 @@
     "type": "START_FILE"
   },
   {
-    "sentence": "open instagram",
-    "execute": "\"<CHROME>\" https://instagram.com",
+    "sentence": "open facebook",
+    "execute": "\"<CHROME>\" https://www.facebook.com",
+    "type": "START_FILE"
+  },
+  {
+    "sentence": "open youtube",
+    "execute": "\"<CHROME>\" https://youtube.com",
+    "type": "START_FILE"
+  },
+  {
+    "sentence": "open reddit",
+    "execute": "\"<CHROME>\" https://reddit.com",
     "type": "START_FILE"
   }
 ]

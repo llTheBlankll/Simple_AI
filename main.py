@@ -1,5 +1,4 @@
 import json
-import time
 
 import pyttsx3  # Recognition Voice Function
 import datetime
@@ -34,31 +33,34 @@ def speak(text):
 # This function will speak or greet you
 def wishMe():
     hour = int(datetime.datetime.now().hour)
-    if hour >= 0 and hour < 12:
+    if 0 <= hour < 12:
         speak("Good Morning" + MASTER)
-    elif hour >= 12 and hour < 18:
+    elif 12 <= hour < 18:
         speak("Good Afternoon" + MASTER)
     else:
         speak("Good Evening" + MASTER)
-    # speak("I am Jarvis. How may I help you?")
 
 
 # This function will take command from Microphone
 def takeCommand() -> str:
+    query = ""  # To prevent local variable referenced before assignment.
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
-        audio = r.listen(source)
-
+        """
+        That got you a little closer to the actual phrase, but it still isn’t perfect.
+        Also, “what” is missing from the beginning of the phrase. Why is that?
+        """
+        r.adjust_for_ambient_noise(source=source, duration=0.5)
+        audio = r.listen(source, timeout=0)
     try:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-us')
         print(f"user said: {query}\n")
     except sr.WaitTimeoutError:
-        print("Say that again please.")
-        query = None
+        pass
     except sr.UnknownValueError:
-        print("Unknown Value ERROR")
+        pass
 
     return query if query is not None or query != "" else exit(1)
 
@@ -77,7 +79,7 @@ def special_string_replace(value: str):
 
 
 def sentence_execution():
-    # Temporarily disabled for testing and developement.
+    # Temporarily disabled for testing and development.
     # query = takeCommand()
 
     with open("sentences_logic.json", "r") as sentences:
@@ -87,7 +89,7 @@ def sentence_execution():
         query = takeCommand()
 
         if query == "" or query is None:
-            speak("Please say a voice command.")
+            print("Waiting for Voice Command.")
             return
 
         for sentence_object in data:
@@ -100,7 +102,7 @@ def sentence_execution():
                 # the code according to the meaning of the sentence is called.
                 special_string_processed = special_string_replace(sentence_execute)
 
-                # START_FILE: This will start the file with or without argument.
+                # START_FILE: This will start the files like Chrome executable or Visual Studio Code with or without argument.
                 # SAY: Use the speak() function to say.
                 if sentence_type == "START_FILE":
                     os.system(special_string_processed)
@@ -111,6 +113,7 @@ def sentence_execution():
             # Else, we will create our own block just like the first version of this project.
             elif "what is today's weather" in query.lower():
                 speak(f"Today's weather is {mod_weather.getTodayCondition()}")
+                print(f"Today's weather is {mod_weather.getTodayCondition()}")
                 break
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
