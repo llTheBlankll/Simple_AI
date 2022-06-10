@@ -1,27 +1,32 @@
-import json
-
-import pyttsx3  # Recognition Voice Function
 import datetime
-import speech_recognition as sr
-import wikipedia
-import os
-import dotenv
+import json  # Manipulating JSON Format files.
+import os  # Manipulating and opening files.
+import win10toast  # Displaying Notification
+import dotenv  # loading Configuration
+import pyttsx3  # Recognition Voice Function
+import requests
+import speech_recognition as sr  # Voice Recognition and commands
+import wikipedia  # Dictionary and definitions.
 
-from weather import Weather
+# User Music manipulate.
 from music import Music
 
-# Load the environment variables which is more safe and a good habit rather than loading it directly on the script.
+# Getting Weather Conditions.
+from weather import Weather
+
+# Load the environment variables file which is more safe and a good habit rather than loading it directly on the script.
 dotenv.load_dotenv(dotenv_path="./config.env")
 
 MASTER = os.getenv("MASTER")
 
-engine = pyttsx3.init('sapi5')
+engine = pyttsx3.init("sapi5")
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
+engine.setProperty('voice', voices[1].id)
 
 # * Modules Startup
 mod_weather = Weather(os.getenv("WEATHER_API"))
 mod_music = Music(os.getenv("MUSIC_BASE_DIRECTORY"))
+toast = win10toast.ToastNotifier()
 
 
 # Speak Function
@@ -51,8 +56,8 @@ def takeCommand() -> str:
         That got you a little closer to the actual phrase, but it still isn’t perfect.
         Also, “what” is missing from the beginning of the phrase. Why is that?
         """
-        r.adjust_for_ambient_noise(source=source, duration=0.5)
-        audio = r.listen(source, timeout=0)
+        r.adjust_for_ambient_noise(source=source, duration=0.25)
+        audio = r.listen(source, timeout=5)
     try:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-us')
@@ -117,7 +122,11 @@ def sentence_execution():
                 break
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
-                info = wikipedia.summary(query.lower(), sentences=2)
+                try:
+                    info = wikipedia.summary(query.lower(), sentences=2)
+                except wikipedia.exceptions.PageError:
+                    speak("No matching page in Wikipedia.")
+                    return
                 speak(info)
             elif ("play music" in query.lower()) or ("play song" in query.lower()):
                 mod_music.play_music()
@@ -127,6 +136,9 @@ def sentence_execution():
                 break
             elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
                 mod_music.replay_music()
+                break
+            elif "my ip address" in query.lower():
+                toast.show_toast("IP Address", requests.get("https://api.ipify.org/").text)
                 break
 
 

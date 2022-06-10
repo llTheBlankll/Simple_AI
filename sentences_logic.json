@@ -28,6 +28,16 @@
     "sentence": "open my github profile",
     "execute": "\"<CHROME>\" https://github.com/<GITHUB_PROFILE>",
     "type": "START_FILE"
+  },
+  {
+    "sentence": "open my chrome settings",
+    "execute": "\"<CHROME>\" chrome://settings",
+    "type": "START_FILE"
+  },
+  {
+    "sentence": "show my browser history",
+    "execute": "\"<CHROME>\" chrome://history",
+    "type": "START_FILE"
   }
 ]
 

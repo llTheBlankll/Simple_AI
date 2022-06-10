@@ -1,9 +1,8 @@
-import time
+import multiprocessing  # Separating the Process between main and music so that we can continue executing voice commands.
 import os
-import \
-    multiprocessing  # Separating the Process between main and music so that we can continue executing voice commands.
-import mutagen.mp3  # Getting the duration of the song.
 import threading
+import time
+import mutagen.mp3  # Getting the duration of the song.
 import playsound
 
 

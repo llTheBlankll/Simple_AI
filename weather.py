@@ -1,5 +1,5 @@
 import os
-import json
+
 import dotenv
 import requests
 
