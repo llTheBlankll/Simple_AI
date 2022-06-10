@@ -18,6 +18,16 @@
     "sentence": "open reddit",
     "execute": "\"<CHROME>\" https://reddit.com",
     "type": "START_FILE"
+  },
+  {
+    "sentence": "open github",
+    "execute": "\"<CHROME>\" https://github.com",
+    "type": "START_FILE"
+  },
+  {
+    "sentence": "open my github profile",
+    "execute": "\"<CHROME>\" https://github.com/<GITHUB_PROFILE>",
+    "type": "START_FILE"
   }
 ]
 

@@ -8,5 +8,10 @@
     "name": "<VSCODE_EXE>",
     "data": "VSCODE_EXE",
     "type": "VAR_ENVIRONMENT"
+  },
+  {
+    "name": "<GITHUB_PROFILE>",
+    "data": "GITHUB_PROFILE",
+    "type": "VAR_ENVIRONMENT"
   }
 ]
