@@ -61,7 +61,10 @@ def takeCommand() -> str:
     except sr.UnknownValueError as e:
         print("Unknown Value ERROR")
 
-    return query
+    if query == "" or query is None:
+        speak("Please speak something.")
+    else:
+        return query
 
 
 def special_string_replace(value: str):
@@ -71,9 +74,7 @@ def special_string_replace(value: str):
         for json_object in data:
             for keys, content in json_object.items():
                 if keys == "name" and content in value:
-                    value = value.replace(json_object["name"], os.getenv(json_object["data"]) if json_object[
-                                                                                                     "type"] == "VAR_ENVIRONMENT" else
-                    json_object["data"])
+                    value = value.replace(json_object["name"], os.getenv(json_object["data"]) if json_object["type"] == "VAR_ENVIRONMENT" else json_object["data"])
                     value = value.replace("\\", "/")
                     break
         return value
@@ -87,7 +88,7 @@ def sentence_execution():
         data = json.load(sentences)
 
         # query = takeCommand().lower()
-        query = "open instagra"
+        query = "play music"
 
         for sentence_object in data:
             sentence = sentence_object["sentence"]
@@ -110,6 +111,7 @@ def sentence_execution():
             # Else, we will create our own block just like the first version of this project.
             elif "what is today's weather" in query.lower():
                 speak(f"Today's weather is {mod_weather.getTodayCondition()}")
+                break
             elif "wikipedia" in query.lower():
                 query = query.replace("wikipedia", "")
                 info = wikipedia.summary(query.lower(), sentence=2)
@@ -123,9 +125,9 @@ def sentence_execution():
             elif ("replay music" in query.lower()) or ("replay song" in query.lower()):
                 mod_music.replay_music()
                 break
-            else:
-                speak("I didn't understand what you said. Please try again.")
-                break
+
+        speak("Sorry, I didn't understand.")
+        return
 
 
 if __name__ == "__main__":
