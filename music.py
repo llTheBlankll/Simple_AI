@@ -1,15 +1,15 @@
 import time
-
-import pydub
 import os
+import \
+    multiprocessing  # Separating the Process between main and music so that we can continue executing voice commands.
+import mutagen.mp3  # Getting the duration of the song.
 import threading
+import playsound
 
-from pydub.playback import play
-
-
-class Music:
+class Music(threading.Thread):
     def __init__(self, song_directory):
         # Check if the directory exists.
+        super().__init__()
         if not os.path.exists(song_directory):
             print("Music Folder doesn't exist. Please configure it on config.env")
             exit(1)
@@ -27,14 +27,36 @@ class Music:
         # Integers
         self.song_duration = 0  # Seconds. Its value will be assigned later.
 
+        # Debugging
+        print("Song Directory: " + self.song_directory)
+        count: int = 0
+        for song in os.listdir(self.song_directory):
+            print(str(count) + ". Song found: " + song.replace(".mp3", ""))
+            count += 1
+
     def play_song(self, song: str):
-        audio_segment = pydub.AudioSegment.from_mp3(song)
-        self.is_playing = True
-        self.song_duration = audio_segment.duration_seconds
-        play(audio_segment)
+        try:
+            print(self.song_directory + "\\" + song)
+            song_path = self.song_directory + "\\" + song
+            self.is_playing = True
+            self.song_duration = mutagen.mp3.MP3(self.song_directory + "\\" + song).info.length
+
+            # Playing the entire duration of song.
+            # block parameter is used to keep the program running and not stop during the song.
+            playsound.playsound(song_path, block=True)
+            print("I CAN STILL CONTINUE!!!")
+        except FileNotFoundError:
+            print(f"File {song} not found.")
+            time.sleep(1)
+            return
+        except KeyboardInterrupt:
+            print("Song Stopped.")
+            return
 
     def play_music(self):
-        for song in os.listdir(self.song_directory):
+        song_directory = os.listdir(self.song_directory)
+        song_directory.remove("desktop.ini")
+        for song in song_directory:
             self.song_thread = threading.Thread(target=self.play_song, args=(song,))
             if self.is_playing:
                 try:
@@ -48,7 +70,10 @@ class Music:
                     print("Song stopped.")
                     self.song_thread.join()
             else:
+                print(f"Play the first song {song}")
                 self.song_thread.run()
+                print("Song started!")
+                time.sleep(self.song_duration)
 
     def stop_music(self):
         if self.song_thread is not None:
