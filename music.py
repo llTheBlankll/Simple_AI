@@ -75,7 +75,7 @@ class Music(threading.Thread):
                 break
 
     def stop_music(self):
-        if self.song_thread is not None:
+        if self.song_thread.is_alive():
             self.song_thread.terminate()
         else:
             print("No music is playing.")
