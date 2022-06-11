@@ -5,7 +5,7 @@ import pyttsx3
 import dotenv
 
 # Initialize configuration environment
-config = dotenv.dotenv_values(dotenv_path="./config.env")
+config = dotenv.dotenv_values(dotenv_path="../config.env")
 
 # Initialize Text to Speech.
 engine = pyttsx3.init()

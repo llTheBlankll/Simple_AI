@@ -3,7 +3,7 @@ import dotenv
 import requests
 
 # Load Environment Variables (config.env)
-dotenv.load_dotenv(dotenv_path="./config.env")
+dotenv.load_dotenv(dotenv_path="../config.env")
 
 
 class Weather:

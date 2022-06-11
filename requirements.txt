@@ -7,3 +7,4 @@ requests
 mutagen
 pipwin
 win10toast
+prettytable

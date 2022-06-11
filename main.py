@@ -11,19 +11,26 @@ import speech_recognition as sr  # Voice Recognition and commands
 import wikipedia  # Dictionary and definitions.
 
 # User Music manipulate.
-from music import Music
+from modules.music import Music
 
 # Getting Weather Conditions.
-from weather import Weather
+from modules.weather import Weather
 
 # For setting up Timer
-from timer import Timer
+from modules.timer import Timer
 
 # Load the environment variables file which is more safe and a good habit rather than loading it directly on the script.
 dotenv.load_dotenv(dotenv_path="./config.env")
 
+# Assign variables.
 MASTER = os.getenv("MASTER")
 
+# File paths for file reading.
+special_text_list_file = os.getenv("SPECIAL_TEXT_LIST")
+sentences_logic_file = os.getenv("SENTENCES_LOGIC_FILE")
+todolist_file = os.getenv("TODOLIST_FILE")
+
+# * Initialize Speech to Text.
 engine = pyttsx3.init("sapi5")
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
@@ -97,7 +104,7 @@ def takeCommand() -> str or None:
 
 def special_string_replace(value: str):
     """
-    In the custom_string_replace.json, this will replace the meaning of special symbols or text like '<CHROME_EXE>',
+    In the special_text.json, this will replace the meaning of special symbols or text like '<CHROME_EXE>',
     with a type of
     'VAR_ENVIRONMENT'
     This means that it will take the value from the 'config.env' which is 'CHROME_EXE'.
@@ -131,15 +138,15 @@ def special_string_replace(value: str):
 
     Parameters
     ----------
-    value: str = the value should be in custom_string_replace.json in a key called "name".
+    value: str = the value should be in special_text.json in a key called "name".
 
     Returns
     -------
-    if the parameter value is "<CHROME>" and if it exists in 'custom_string_replace.json',
-    then using the key called "data" from the file which has the value of 'CHROME_EXE' that exist in 'config.env',
+    if the parameter value is "<CHROME>" and if it exists in 'special_text.json',
+    then using the key called "data" from the file which has the value of 'CHROME_EXE' that exists in 'config.env',
     it will return the data from the value of CHROME_EXE in 'config.env'
     """
-    with open("./custom_string_replace.json", "r") as csp:
+    with open(special_text_list_file, "r") as csp:
         data = json.load(csp)
 
         for json_object in data:
@@ -162,7 +169,7 @@ def sentence_execution():
     -------
     None
     """
-    with open("sentences_logic.json", "r") as sentences:
+    with open(sentences_logic_file, "r") as sentences:
         data = json.load(sentences)
 
         query = takeCommand().lower()
@@ -176,7 +183,7 @@ def sentence_execution():
             sentence_type = sentence_object["type"]
             # * This if condition will be used if we are executing applications or only for the AI Speaking.
             if sentence in query:
-                # If the query has sentenced similar from this,
+                # If the query has been sentenced similar to this,
                 # the code according to the meaning of the sentence is called.
                 special_string_processed = special_string_replace(sentence_execute)
 
