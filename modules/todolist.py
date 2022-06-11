@@ -40,6 +40,7 @@ class ToDoList:
             categories: dict = json.load(cfile)
             for dictionary in categories:
                 categories_table.add_row([dictionary["category_name"], dictionary["category_description"]])
+                break
 
         return categories_table
 
@@ -104,5 +105,56 @@ class ToDoList:
             else:
                 return False
 
-# todolist = ToDoList()
+    def delete_category(self, name) -> bool or None:
+        if not self.does_category_exist(name):
+            speak(f"Category {name} doesn't exist.")
+            return
+        try:
+            categories: dict = json.load(open(self.todolist_category_file, "r"))
+            for category in range(len(categories)):
+                if categories[category]["category_name"] == name:
+                    categories.pop(category)
+                    break
+
+            with open(self.todolist_category_file, "w") as cfile:
+                if json.dump(categories, cfile, indent=2, separators=(",", ": ")):
+                    return True
+                else:
+                    return False
+        except FileNotFoundError:
+            print(f"File not found ({self.todolist_category_file})")
+            sys.exit(1)
+        except json.JSONDecodeError:
+            print(f"Invalid JSON Format ({self.todolist_category_file})")
+            sys.exit(1)
+
+    def update_category(self, old_name: str, new_name: str, new_desc: str) -> bool or None:
+        if not self.does_category_exist(old_name):
+            speak(f"Category {old_name} doesn't exists.")
+            return
+
+        try:
+            categories = json.load(open(self.todolist_category_file, "r"))
+
+            for category in range(len(categories)):
+                if categories[category]["category_name"] == old_name:
+                    categories[category]["category_name"] = new_name
+                    categories[category]["category_description"] = new_desc
+                    with open(self.todolist_category_file, "w") as cfile:
+                        if json.dump(categories, cfile, indent=2, separators=(",", ": ")):
+                            return True
+                        else:
+                            return False
+
+            return False
+
+        except FileNotFoundError:
+            print(f"File not found ({self.todolist_category_file})")
+            sys.exit(1)
+        except json.JSONDecodeError:
+            print(f"Invalid JSON Format ({self.todolist_category_file})")
+            sys.exit(1)
+
+todolist = ToDoList()
 # todolist.create_category("test", "test description")
+# todolist.update_category("test", "wew", "updated wew")
