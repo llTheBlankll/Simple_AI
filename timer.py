@@ -1,12 +1,24 @@
 import multiprocessing
 import threading
 import time
+import pyttsx3
+import dotenv
 
-from main import speak
+# Initialize configuration environment
+config = dotenv.dotenv_values(dotenv_path="./config.env")
+
+# Initialize Text to Speech.
+engine = pyttsx3.init()
+voices = engine.getProperty("voices")
+engine.setProperty("voice", voices[0].id)
+
+# Initialize variables
+beeps: int = int(config["BEEPS"])
 
 
-def beep():
-    print("\a")
+def speak(sentence: str):
+    engine.say(sentence)
+    engine.runAndWait()
 
 
 def Tuple_getValueIndex(value: str, tup: list) -> object or int:
@@ -18,12 +30,15 @@ def Tuple_getValueIndex(value: str, tup: list) -> object or int:
     @return: 2
     """
     count = 0
+
+    i: str  # Variable Hint
     for i in tup:
-        if i == value:
+        if i.lower() == value.lower():
             return count
         else:
             count += 1
 
+    # Return None if nothing is found.
     return None
 
 
@@ -33,7 +48,8 @@ class Timer(threading.Thread):
         Takes the countdown in a sentence form.
         Ex:
         "set timer for 1 hour and 30 minutes"
-        This will convert this sentence into countdown seconds which is a total of 7200 seconds.
+        This will convert the sentence into countdown seconds which is a total of 5,400 seconds as shown above.
+        an hour is equal to 3,600 seconds and 30 minutes is 1,800 seconds so if we add these two, the result will be 7,200 seconds total.
         or
         "1 hour and 30 seconds"
         which is a total of 3630 seconds.
@@ -58,8 +74,7 @@ class Timer(threading.Thread):
                     minute_index = Tuple_getValueIndex("minutes", words) if "minute" and "minutes" in words else None
 
                 if second_index is None:
-                    second_index = Tuple_getValueIndex("seconds" or "seconds",
-                                                       words) if "second" and "seconds" in words else None
+                    second_index = Tuple_getValueIndex("seconds", words) if "second" and "seconds" in words else None
 
                 hour_value = int(words[hour_index - 1]) if hour_index is not None else 0
                 minute_value = int(words[minute_index - 1]) if minute_index is not None else 0
@@ -73,6 +88,11 @@ class Timer(threading.Thread):
                 print(e)
                 speak("Make sure you spoke the words and numbers correctly.")
                 exit(0)
+        else:
+            try:
+                self.countdown = int(words[0])
+            except TypeError:
+                pass
 
     def __countdown__(self):
         """
@@ -85,18 +105,23 @@ class Timer(threading.Thread):
             self.countdown -= 1
             time.sleep(1)
 
+        # If the countdown is finished, beep for 1 time every second until 5 beeps.
+        if self.countdown <= 0:
+            for i in range(beeps):
+                print("\a")
+                time.sleep(1)
+
     def start_countdown(self):
         """
         Start the countdown by using "time.sleep" and subtracting "self.countdown" by 1 every second.
         @return: None
         """
-        self.countdown_process = multiprocessing.Process(target=self.__countdown__(), args=(self.countdown, ))
-        self.countdown_process.start()
+        self.countdown_process = multiprocessing.Process(target=self.__countdown__(), args=(self.countdown,))
 
     def stop_countdown(self):
         """
         Basically stopping the Process because the "self.countdown" is already got subtracted, so we can continue
-        where we left.
+        where we left off.
         @return: None
         """
         if self.countdown_process.is_alive():
@@ -111,7 +136,7 @@ class Timer(threading.Thread):
         @return: None
         """
         self.countdown_process = multiprocessing.Process(target=self.__countdown__(), args=(self.countdown,))
-        self.countdown_process.start()
+
 
 # test("set timer for 2 hours and 30 minutes".split(" "))
-# Timer("1 seconds".split(" ")).start_countdown()
+Timer("1 seconds".split(" ")).start_countdown()
