@@ -60,7 +60,7 @@ class Music(threading.Thread):
                     print("Playing...")
                     time.sleep(self.song_duration)
                     print(f"Song {song} is finished playing.")
-                    print(f"Playing next song...")
+                    print("Playing next song...")
                 except KeyboardInterrupt:
                     print("Stopping Song...")
                     time.sleep(0.5)

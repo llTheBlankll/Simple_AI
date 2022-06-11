@@ -5,7 +5,7 @@
     "type": "VAR_ENVIRONMENT"
   },
   {
-    "name": "<VSCODE_EXE>",
+    "name": "<VSCODE>",
     "data": "VSCODE_EXE",
     "type": "VAR_ENVIRONMENT"
   },
