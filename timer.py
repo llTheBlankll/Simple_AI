@@ -1,37 +1,117 @@
+import multiprocessing
 import threading
 import time
-import multiprocessing
+
+from main import speak
 
 
 def beep():
     print("\a")
 
 
+def Tuple_getValueIndex(value: str, tup: list) -> object or int:
+    """
+    Get the index (int) of a value in a list.
+
+    @param value: "value 2"
+    @param tup: ["value 0", "value 1", "value 2", "value "3]
+    @return: 2
+    """
+    count = 0
+    for i in tup:
+        if i == value:
+            return count
+        else:
+            count += 1
+
+    return None
+
+
 class Timer(threading.Thread):
-    def __init__(self, timer=0, *args):
+    def __init__(self, words: list):
+        """
+        Takes the countdown in a sentence form.
+        Ex:
+        "set timer for 1 hour and 30 minutes"
+        This will convert this sentence into countdown seconds which is a total of 7200 seconds.
+        or
+        "1 hour and 30 seconds"
+        which is a total of 3630 seconds.
+
+        @param words:
+        """
         super().__init__()
-        self.timer = timer
-        self.countdown = 0
+        self.countdown_process = multiprocessing.Process()
 
-        if len(args) >= 1:
-            if args[0] == "minutes" or args[0] == "minute":
-                self.countdown = timer * 60
-            elif len(args) >= 1 and args[0] == "hours" or args[0] == "hour":
-                self.countdown = (timer * 60) * 60
-            else:
-                self.countdown = timer
+        if len(words) >= 1:
+            try:
+                # Try singular form
+                hour_index = Tuple_getValueIndex("hour", words) if "hour" or "hours" in words else None
+                minute_index = Tuple_getValueIndex("minute", words) if "minute" and "minutes" in words else None
+                second_index = Tuple_getValueIndex("second", words) if "second" and "seconds" in words else None
 
-        self.start_countdown()
+                # Try plural form
+                if hour_index is None:
+                    hour_index = Tuple_getValueIndex("hours", words) if "hour" or "hours" in words else None
 
-    def start_countdown(self):
-        print("Timer starting now!")
+                if minute_index is None:
+                    minute_index = Tuple_getValueIndex("minutes", words) if "minute" and "minutes" in words else None
+
+                if second_index is None:
+                    second_index = Tuple_getValueIndex("seconds" or "seconds",
+                                                       words) if "second" and "seconds" in words else None
+
+                hour_value = int(words[hour_index - 1]) if hour_index is not None else 0
+                minute_value = int(words[minute_index - 1]) if minute_index is not None else 0
+                second_value = int(words[second_index - 1]) if second_index is not None else 0
+                # Example:
+                # If the query is:
+                # set timer for 1 hour and 30 minutes.
+                # the hour_value would be '1' and the minute value will '30'
+                self.countdown = second_value + (60 * minute_value) + (3600 * hour_value)
+            except TypeError as e:
+                print(e)
+                speak("Make sure you spoke the words and numbers correctly.")
+                exit(0)
+
+    def __countdown__(self):
+        """
+        This function should be called with Process or a Thread.
+        This function initiate and the countdown and its internal mechanism.
+        @return: None
+        """
         for i in range(self.countdown):
             i += 1
-            print(i)
+            self.countdown -= 1
             time.sleep(1)
 
-        # Indicator that the Timer is finished.
-        # Beep 3x
-        for i in range(3):
-            beep()
-            time.sleep(1)
+    def start_countdown(self):
+        """
+        Start the countdown by using "time.sleep" and subtracting "self.countdown" by 1 every second.
+        @return: None
+        """
+        self.countdown_process = multiprocessing.Process(target=self.__countdown__(), args=(self.countdown, ))
+        self.countdown_process.start()
+
+    def stop_countdown(self):
+        """
+        Basically stopping the Process because the "self.countdown" is already got subtracted, so we can continue
+        where we left.
+        @return: None
+        """
+        if self.countdown_process.is_alive():
+            self.countdown_process.terminate()
+        else:
+            speak("Countdown has not started yet.")
+            print("Countdown has not started yet.")
+
+    def resume_countdown(self):
+        """
+        Alias of start_countdown()
+        @return: None
+        """
+        self.countdown_process = multiprocessing.Process(target=self.__countdown__(), args=(self.countdown,))
+        self.countdown_process.start()
+
+# test("set timer for 2 hours and 30 minutes".split(" "))
+# Timer("1 seconds".split(" ")).start_countdown()

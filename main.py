@@ -140,6 +140,8 @@ def sentence_execution():
             elif "my ip address" in query.lower():
                 toast.show_toast("IP Address", requests.get("https://api.ipify.org/").text)
                 break
+            elif "set timer" in query.lower():
+                break
 
 
 if __name__ == "__main__":
