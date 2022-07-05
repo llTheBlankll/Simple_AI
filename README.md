@@ -9,6 +9,3 @@ With this, you can make your work easier and more productive.
 * After that, type `pip install -r requirements.txt` to install the necessary dependencies for the program to run.
 * Install PyAudio `pipwin install pyaudio`, may take a while.
 * Run the program, `python main.py`
-
-# Special thanks for inspiring us, Programmers.
-@Miles-coder2000
